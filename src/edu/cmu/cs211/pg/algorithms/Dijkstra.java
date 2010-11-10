@@ -1,10 +1,12 @@
 package edu.cmu.cs211.pg.algorithms;
 
 import java.util.Map;
+
 import edu.cmu.cs211.pg.graph.Graph;
 import edu.cmu.cs211.pg.graph.Path;
 import edu.cmu.cs211.pg.graph.WeightedEdge;
 
+import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -61,7 +63,8 @@ public class Dijkstra
 			
 			
 		// Create our priority queues for processed children
-		PriorityQueue<WeightedEdge<V>> childrenEdges = new PriorityQueue<WeightedEdge<V>>();
+		PriorityQueue<WeightedEdge<V>> childrenEdges = 
+			new PriorityQueue<WeightedEdge<V>>(10, new edgeComparator<WeightedEdge<V>>());
 		
 		HashMap<V, Integer> distanceMap = new HashMap<V, Integer>();
 		HashMap<V, V> previousMap = new HashMap<V, V>();
@@ -148,6 +151,30 @@ public class Dijkstra
 			}
 		}
 		return returnMap;
+	}
+	
+	// B|
+	// The WeightedEdge compare judges on VERTICES first, not weight
+	// Since I don't know whether I should change WeightedEdge
+	// I just made a personal comparator instead
+	private class edgeComparator<E extends WeightedEdge> implements Comparator<E>
+	{
+		public int compare(E o1, E o2)
+		{
+			if (o1 == null && o2 == null)
+				return 0;
+			else if (o1 == null)
+				return -1;
+			else if (o2 == null)
+				return 1;
+			
+			if (o1.weight() < o2.weight())
+				return -1;
+			else if (o1.weight() > o2.weight())
+				return 1;
+			else
+				return 0;
+		}
 	}
 }
 

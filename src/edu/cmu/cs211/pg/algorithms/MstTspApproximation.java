@@ -78,10 +78,14 @@ public class MstTspApproximation<V extends Comparable<V>>
 			throw new IllegalArgumentException();*/
 		
 		// turn graph into a new graph containing only the vertices in verts
-		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
-
-		// form basic graph with all edges directly between vertices
+		//Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
+		
+		// This makes copying the graph a lot simpler
+		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(g);
 		Object[] it = verts.toArray();
+		
+		// form basic graph with all edges directly between vertices
+		/*Object[] it = verts.toArray();
 		for (int i = 0; i < it.length; i++) {
 			for (int j = 0; j < it.length; j++) {
 				if (i == j)
@@ -91,7 +95,7 @@ public class MstTspApproximation<V extends Comparable<V>>
 				if (newEdge != null)
 					reduced.addEdge(newEdge);
 			}
-		}
+		}*/
 		
 		// add on edges that do not exist in current graph
 		for (int i = 0; i < it.length; i++) {
@@ -165,8 +169,15 @@ public class MstTspApproximation<V extends Comparable<V>>
 
 		PriorityQueue<V> neighbors = new PriorityQueue<V>(mst.outgoingNeighbors(start));
 		while (!neighbors.isEmpty()) {
-			ret.addAll(dfs(mst, neighbors.poll(), visited));
-			ret.add(start);
+			V neighbor = neighbors.poll();
+			
+			// Have we already looked at the node?
+			if (!visited.contains(neighbor)) {
+				
+				// Traverse via preorder -- add nodes once we've added their children
+				ret.addAll(dfs(mst, neighbor, visited));
+				ret.add(start);
+			}
 		}
 		
 		return ret;

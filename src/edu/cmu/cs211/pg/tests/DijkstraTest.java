@@ -6,11 +6,9 @@ import static org.junit.Assert.fail;
 
 import edu.cmu.cs211.pg.graph.*;
 import edu.cmu.cs211.pg.algorithms.Dijkstra;
-import edu.cmu.cs211.pg.algorithms.Kruskal;
-import edu.cmu.cs211.pg.algorithms.MstTspApproximation;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 public class DijkstraTest {
 	
@@ -141,5 +139,51 @@ public class DijkstraTest {
 		assertEquals(myD.shortestPath(g, "1", "6").pathWeight(), 11);
 		assertEquals(myD.shortestPath(g, "1", "4").pathWeight(), 20);
 		assertEquals(myD.shortestPath(g, "1", "5").pathWeight(), 20);
+	}
+	
+	// I copied this graph from MstTspApproxTest
+	@Test
+	public void doubleEdgeTest()
+	{
+		Graph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
+		
+		g.addVertex("a");
+		g.addVertex("b");
+		g.addVertex("c");
+		g.addVertex("d");
+		g.addVertex("e");
+		
+		g.addEdge(new WeightedEdge<String>("b", "a", 1));
+		g.addEdge(new WeightedEdge<String>("a", "b", 1));
+		
+		g.addEdge(new WeightedEdge<String>("e", "a", 2));
+		g.addEdge(new WeightedEdge<String>("a", "e", 2));
+		
+		g.addEdge(new WeightedEdge<String>("e", "d", 3));
+		g.addEdge(new WeightedEdge<String>("d", "e", 3));
+		
+		g.addEdge(new WeightedEdge<String>("e", "c", 4));
+		g.addEdge(new WeightedEdge<String>("c", "e", 4));
+		
+		g.addEdge(new WeightedEdge<String>("e", "b", 5));
+		g.addEdge(new WeightedEdge<String>("b", "e", 5));
+		
+		g.addEdge(new WeightedEdge<String>("d", "c", 6));
+		g.addEdge(new WeightedEdge<String>("c", "d", 6));
+		
+		Dijkstra myD = new Dijkstra();
+		Map<String, Path<String,WeightedEdge<String>>> myMap = myD.allShortestPaths(g, "a");
+		
+		assertEquals(myMap.get("a").pathWeight(), 0);
+		assertEquals(myMap.get("b").pathWeight(), 1);
+		assertEquals(myMap.get("c").pathWeight(), 6);
+		assertEquals(myMap.get("d").pathWeight(), 5);
+		assertEquals(myMap.get("e").pathWeight(), 2);
+		
+		assertEquals(myMap.get("a").vertices().isEmpty(), true);
+		assertEquals(myMap.get("b").vertices(), Arrays.asList("b"));
+		assertEquals(myMap.get("c").vertices(), Arrays.asList("e", "c"));
+		assertEquals(myMap.get("d").vertices(), Arrays.asList("e", "d"));
+		assertEquals(myMap.get("e").vertices(), Arrays.asList("e"));
 	}
 }
