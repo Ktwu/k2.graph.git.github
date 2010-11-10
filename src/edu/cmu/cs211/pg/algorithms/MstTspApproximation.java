@@ -126,10 +126,18 @@ public class MstTspApproximation<V extends Comparable<V>>
 		HashSet<V> visited = new HashSet<V>();
 		directedToUndirected(mst);
 		//System.out.println(mst.vertices());
-		List<V> nodes = dfs(mst, start, visited); // make copy of verts later
-		nodes.remove(0);
+		List<V> order = dfs(mst, start, visited); // the order in which we visit the nodes needed
+		order.remove(0);
+		order.add(start);
 		//System.out.println(nodes);
-		return nodes;
+		
+		// list of all nodes we visit, in order, in our traversal
+		List<V> traversal = new ArrayList<V>();
+		traversal.addAll(dijkstra.shortestPath(g, start, order.get(0)).vertices());
+		for (int i = 1; i < order.size(); i++)
+			traversal.addAll(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).vertices());
+		traversal.addAll(dijkstra.shortestPath(g, order.get(order.size() - 1), start).vertices());
+		return traversal;
 		
 		/*
 		// Return only the nodes we need
@@ -173,10 +181,8 @@ public class MstTspApproximation<V extends Comparable<V>>
 			
 			// Have we already looked at the node?
 			if (!visited.contains(neighbor)) {
-				
-				// Traverse via preorder -- add nodes once we've added their children
+				// Traverse via preorder
 				ret.addAll(dfs(mst, neighbor, visited));
-				ret.add(start);
 			}
 		}
 		
