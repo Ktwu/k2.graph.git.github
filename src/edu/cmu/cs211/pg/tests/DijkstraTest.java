@@ -55,11 +55,21 @@ public class DijkstraTest {
 		MyDirectedGraph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
 		g.addVertex("A");
 		g.addVertex("B");
+		g.addVertex("C");
+		g.addVertex("D");
+		g.addVertex("X");
+		g.addVertex("Y");
 		
-		g.addEdge(new WeightedEdge<String>("A", "B", -1));
+		g.addEdge(new WeightedEdge<String>("A", "B", 1));
+		g.addEdge(new WeightedEdge<String>("A", "C", 1));
+		g.addEdge(new WeightedEdge<String>("C", "D", 1));
+		
+		// Even though we never consider this edge
+		// We should still throw an illegalArgumentException
+		g.addEdge(new WeightedEdge<String>("X", "Y", -1));
 		
 		Dijkstra myD = new Dijkstra();
-		myD.shortestPath(g, "A", "B");
+		myD.shortestPath(g, "A", "D");
 		fail();
 	}
 	
