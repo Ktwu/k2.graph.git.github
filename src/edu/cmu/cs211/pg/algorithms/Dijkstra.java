@@ -91,6 +91,12 @@ public class Dijkstra
 				childrenEdges.add(new WeightedEdge<V>(start, tempNode, 0));
 			else
 				childrenEdges.add(new WeightedEdge<V>(start, tempNode, Integer.MAX_VALUE));
+			
+			// Check all the outgoing edges and make sure none of them are negative
+			Set<E> edges = g.outgoingEdges(tempNode);
+			for (E edge : edges)
+				if (edge.weight() < 0)
+					throw new IllegalArgumentException("Found negative edge weight in Dijkstra's");
 		}
 		
 		

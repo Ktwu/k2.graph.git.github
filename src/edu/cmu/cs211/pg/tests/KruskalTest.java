@@ -68,4 +68,42 @@ public class KruskalTest {
 		Graph<String, WeightedEdge<String>> mst = k.MST(g);
 		assertEquals("MST should be null", mst, null);
 	}
+	
+	@Test
+	public void doubleEdgeTest()
+	{
+		Kruskal k = new Kruskal();
+		Graph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
+		
+		g.addVertex("a");
+		g.addVertex("b");
+		g.addVertex("c");
+		g.addVertex("d");
+		g.addVertex("e");
+		
+		g.addEdge(new WeightedEdge<String>("b", "a", 1));
+		g.addEdge(new WeightedEdge<String>("a", "b", 1));
+		
+		g.addEdge(new WeightedEdge<String>("e", "a", 2));
+		g.addEdge(new WeightedEdge<String>("a", "e", 2));
+		
+		g.addEdge(new WeightedEdge<String>("e", "d", 3));
+		g.addEdge(new WeightedEdge<String>("d", "e", 3));
+		
+		g.addEdge(new WeightedEdge<String>("e", "c", 4));
+		g.addEdge(new WeightedEdge<String>("c", "e", 4));
+		
+		g.addEdge(new WeightedEdge<String>("e", "b", 5));
+		g.addEdge(new WeightedEdge<String>("b", "e", 5));
+		
+		g.addEdge(new WeightedEdge<String>("d", "c", 6));
+		g.addEdge(new WeightedEdge<String>("c", "d", 6));
+		
+		Graph<String, WeightedEdge<String>> mst = k.MST(g);
+		
+		System.out.println(g.toString());
+		
+	}
+	
+	
 }

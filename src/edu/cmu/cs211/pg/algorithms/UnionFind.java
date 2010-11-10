@@ -35,11 +35,8 @@ public class UnionFind<T>
 		if (a == null || b == null)
 			throw new NullPointerException("union(a,b): a and/or b are null!");
 		
-		// First, if a/b aren't in our set, add them!
-		addElement(a);
-		addElement(b);
-		
 		// Find the defining element for both sets
+		// If they're not included, then find() will add them to our set
 		a = find(a);
 		b = find(b);
 		
