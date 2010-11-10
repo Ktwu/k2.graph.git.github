@@ -17,21 +17,11 @@ public class UnionFind<T>
 	HashMap<T, T> unionTree;
 	int setCount;
 	
-	public UnionFind(Collection<T> stuff) 
+	public UnionFind() 
 	{
-		if (stuff == null)
-			throw new NullPointerException("UnionFind(stuff): stuff is null!");
-		
 		// Initialize our map
 		unionTree = new HashMap<T, T>();
-		
-		Iterator<T> iStuff = stuff.iterator();
-
-		// Add our Ts to our map for object->small int conversion
-		while (iStuff.hasNext())
-			unionTree.put(iStuff.next(), null);
-		
-		setCount = unionTree.size();
+		setCount = 0;
 	}
 	
 	/**
@@ -45,6 +35,11 @@ public class UnionFind<T>
 		if (a == null || b == null)
 			throw new NullPointerException("union(a,b): a and/or b are null!");
 		
+		// First, if a/b aren't in our set, add them!
+		addElement(a);
+		addElement(b);
+		
+		// Find the defining element for both sets
 		a = find(a);
 		b = find(b);
 		
@@ -71,8 +66,10 @@ public class UnionFind<T>
 		if (a == null)
 			throw new NullPointerException("find(a): a is null!");
 		
-		if (!unionTree.containsKey(a))
-			throw new IllegalArgumentException("find(a): a is not part of UnionFind set!");
+		// If a isn't a part of our set, add it!
+		// Coincidentally, it's also its own set
+		if (addElement(a))
+			return a;
 		
 		// Base case of recursion: our T is a root
 		if (unionTree.get(a) == null)	return a;
@@ -108,10 +105,27 @@ public class UnionFind<T>
 	}
 	
 	/**
+	 * Method for adding a new element to our union find.  It's in its own set.
+	 * @param a The element we want to add
+	 * @return True if the element was added, false if the element already exists in our set
+	 */
+	private boolean addElement(T a)
+	{
+		if (!unionTree.containsKey(a))
+		{	
+			unionTree.put(a, null);		
+			setCount++; 
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Simple method for comparing T objects
 	 * Because I can't treat them as pointers :/
 	 */
-	public int myCompare(T a, T b)
+	private int myCompare(T a, T b)
 	{
 		if (a == null && b == null)
 			return 0;

@@ -96,11 +96,4 @@ public interface Graph<V extends Comparable<V>,E extends Edge<V>> {
 	 */
 	public Set<E> outgoingEdges (V vertex);
 	
-	/**
-	 * Checks whether the graph contains the node
-	 * @param vertex The vertex that we want to check
-	 * @throws NullPointerException if the vertex is null.
-	 * @return True if the vertex is in the graph, false otherwise
-	 */
-	public boolean contains (V vertex);
 }

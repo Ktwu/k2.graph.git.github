@@ -260,11 +260,11 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		return adjacencyList.get(vertex);
 	}
 	
-	public boolean contains (V vertex)
+	/*public boolean contains (V vertex)
 	{
 		checkForNull(vertex, "contains(vertex): vertex is null!");
 		return adjacencyList.containsKey(vertex);
-	}
+	}*/
 	
 	/**
 	 * checkForNull(): Convenient method for checking null objects

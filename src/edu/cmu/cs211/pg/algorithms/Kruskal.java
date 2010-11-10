@@ -38,8 +38,8 @@ public class Kruskal
 		int numEdges = 0; // we count the number of edges in the final MST
 		
 		Graph<V,E> kruskal = new MyDirectedGraph<V,E>(g);
-		UnionFind<V> uf = new UnionFind<V>(kruskal.vertices());
-		
+		UnionFind<V> uf = new UnionFind<V>();
+				
 		// B|
 		// I need to implement a comparator that sorts based on weight
 		// Not on vertices
@@ -51,10 +51,13 @@ public class Kruskal
 		
 		kruskal.clearEdges();
 		
+		// Just go through our edges and select the least weighted ones first
 		while (!edges.isEmpty())
 		{
 			WeightedEdge<V> popped = edges.poll();
 			
+			// We just add elements to our union find whenever we try to
+			// union two elements or find a given element
 			if (!uf.find(popped.dest()).equals(uf.find(popped.src())))
 			{
 				uf.union(popped.dest(), popped.src());

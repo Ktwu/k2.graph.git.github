@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Dijkstra
 {
@@ -30,7 +31,7 @@ public class Dijkstra
 	{		
 		if (goal == null)
 			throw new NullPointerException("shortestPath(g, start, goal): goal is null");
-		if (!g.contains(goal))	
+		if (!contains(g, goal))	
 			throw new IllegalArgumentException("shortestPath(g, start, goal): goal is not in graph");
 
 		return allShortestPaths(g, start).get(goal);
@@ -56,7 +57,7 @@ public class Dijkstra
 			|| g == null)
 				throw new NullPointerException("allShortestPaths(g, start): null argument!");
 			
-			if (!g.contains(start))
+			if (!contains(g, start))
 					throw new IllegalArgumentException("allShortestPaths(g, start): g does not contain start!");
 			
 			
@@ -151,6 +152,23 @@ public class Dijkstra
 			}
 		}
 		return returnMap;
+	}
+	
+	/**
+	 * Private method for determining whether a graph contains a vertex
+	 * Since our Graph interface contains no such method
+	 * And front desk yells at me if I try changing it :/
+	 * 
+	 * @param <V>
+	 * @param <E>
+	 * @param g The graph we want to check
+	 * @param node The node we want to find
+	 * @return
+	 */
+	private <V extends Comparable<V>,E extends WeightedEdge<V>> boolean contains(Graph<V,E> g, V node)
+	{
+		Set<V> vertices = g.vertices();
+		return vertices.contains(node);
 	}
 	
 	// B|
