@@ -35,6 +35,8 @@ public class Kruskal
 		if (g == null)
 			throw new NullPointerException("MST(g): g is null!");
 		
+		int numEdges = 0; // we count the number of edges in the final MST
+		
 		Graph<V,E> kruskal = new MyDirectedGraph<V,E>(g);
 		UnionFind<V> uf = new UnionFind<V>(kruskal.vertices());
 		
@@ -57,11 +59,16 @@ public class Kruskal
 			{
 				uf.union(popped.dest(), popped.src());
 				kruskal.addEdge((E)popped);
+				numEdges++;
 			}
 		}
 		
 		// Check that we've connected all of our nodes
 		if (uf.uniqueSets() != 1)
+			return null;
+		
+		// check that |V| = |E| + 1
+		if (kruskal.vertices().size() != numEdges + 1)
 			return null;
 		
 		return kruskal;

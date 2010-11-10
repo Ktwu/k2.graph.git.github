@@ -89,6 +89,7 @@ public class Path<V extends Comparable<V>, E extends WeightedEdge<V>>
 	{
 		return new Path<V,E>(e.dest(),e,this);
 	}
+	
 	private Path(V vert, E predEdge, Path<V,E> pred)
 	{
 		this.vertex = vert;
@@ -129,6 +130,19 @@ public class Path<V extends Comparable<V>, E extends WeightedEdge<V>>
 			return 1;
 		}
 		return 0;
+	}
+	
+	/**
+	 * list of vertices in the path, in order
+	 * @return list of vertices (without first vertex in path)
+	 */
+	public List<V> vertices()
+	{
+		if (pred == null)
+			return new LinkedList<V>();
+		List<V> ret = pred.vertices();
+		ret.add(vertex);
+		return ret;
 	}
 	
 	public String toString()

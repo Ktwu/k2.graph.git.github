@@ -6,8 +6,11 @@ import static org.junit.Assert.fail;
 
 import edu.cmu.cs211.pg.graph.*;
 import edu.cmu.cs211.pg.algorithms.Dijkstra;
+import edu.cmu.cs211.pg.algorithms.Kruskal;
+import edu.cmu.cs211.pg.algorithms.MstTspApproximation;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class DijkstraTest {
 	
@@ -139,6 +142,4 @@ public class DijkstraTest {
 		assertEquals(myD.shortestPath(g, "1", "4").pathWeight(), 20);
 		assertEquals(myD.shortestPath(g, "1", "5").pathWeight(), 20);
 	}
-
-		
 }
