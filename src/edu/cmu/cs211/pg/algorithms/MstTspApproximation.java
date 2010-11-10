@@ -67,25 +67,9 @@ public class MstTspApproximation<V extends Comparable<V>>
 		if (g == null || verts == null || start == null)
 			throw new NullPointerException("Null parameter to approximateTour()");
 		
-		Iterator<V> blah = verts.iterator();
-		//System.out.println(dijkstra.shortestPath(g, blah.next(), blah.next()));
-		//System.out.println(kruskal.MST(g));
-		
-		/*// check if every element in
-		HashSet<V> vertsCopy = new HashSet<V>(verts);
-		vertsCopy.removeAll(g.vertices());
-		if (!vertsCopy.isEmpty())
-			throw new IllegalArgumentException();*/
-		
-		// turn graph into a new graph containing only the vertices in verts
-		//Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
-		
-		// This makes copying the graph a lot simpler
-		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(g);
+		// form basic graph of ONLY verts with all edges directly between vertices
+		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
 		Object[] it = verts.toArray();
-		
-		// form basic graph with all edges directly between vertices
-		/*Object[] it = verts.toArray();
 		for (int i = 0; i < it.length; i++) {
 			for (int j = 0; j < it.length; j++) {
 				if (i == j)
@@ -95,7 +79,7 @@ public class MstTspApproximation<V extends Comparable<V>>
 				if (newEdge != null)
 					reduced.addEdge(newEdge);
 			}
-		}*/
+		}
 		
 		// add on edges that do not exist in current graph
 		for (int i = 0; i < it.length; i++) {
@@ -125,15 +109,13 @@ public class MstTspApproximation<V extends Comparable<V>>
 		// DFS to pre-order traversal of the MST
 		HashSet<V> visited = new HashSet<V>();
 		directedToUndirected(mst);
-		//System.out.println(mst.vertices());
 		List<V> order = dfs(mst, start, visited); // the order in which we visit the nodes needed
-		order.remove(0);
+		//order.remove(0);
 		order.add(start);
-		//System.out.println(nodes);
 		
 		// list of all nodes we visit, in order, in our traversal
 		List<V> traversal = new ArrayList<V>();
-		traversal.addAll(dijkstra.shortestPath(g, start, order.get(0)).vertices());
+		//traversal.addAll(dijkstra.shortestPath(g, start, order.get(0)).vertices());
 		for (int i = 1; i < order.size(); i++)
 			traversal.addAll(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).vertices());
 		traversal.addAll(dijkstra.shortestPath(g, order.get(order.size() - 1), start).vertices());
