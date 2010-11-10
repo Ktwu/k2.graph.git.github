@@ -181,7 +181,7 @@ public class Dijkstra
 	// The WeightedEdge compare judges on VERTICES first, not weight
 	// Since I don't know whether I should change WeightedEdge
 	// I just made a personal comparator instead
-	private class edgeComparator<E extends WeightedEdge> implements Comparator<E>
+	private static class edgeComparator<E extends WeightedEdge> implements Comparator<E>
 	{
 		public int compare(E o1, E o2)
 		{
