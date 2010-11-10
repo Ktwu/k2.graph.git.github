@@ -9,10 +9,12 @@ import edu.cmu.cs211.pg.bots.student.MyTreasureMap;
 public class MyFirstCartographerPirate implements Pirate
 {
 	private MyTreasureMap map;
+	private GameInformation game;
 	
 	public void init(TreasureMap _map, GameInformation game)
 	{
 		this.map = (MyTreasureMap)_map;
+		this.game = game;
 		throw new RuntimeException ("You need to implement this method");
 	}
 

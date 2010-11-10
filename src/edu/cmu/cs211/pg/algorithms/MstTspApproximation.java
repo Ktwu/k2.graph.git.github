@@ -68,8 +68,8 @@ public class MstTspApproximation<V extends Comparable<V>>
 			throw new NullPointerException("Null parameter to approximateTour()");
 		
 		Iterator<V> blah = verts.iterator();
-		System.out.println(dijkstra.shortestPath(g, blah.next(), blah.next()));
-		System.out.println(kruskal.MST(g));
+		//System.out.println(dijkstra.shortestPath(g, blah.next(), blah.next()));
+		//System.out.println(kruskal.MST(g));
 		
 		/*// check if every element in
 		HashSet<V> vertsCopy = new HashSet<V>(verts);
@@ -105,7 +105,6 @@ public class MstTspApproximation<V extends Comparable<V>>
 				
 				Path<V, WeightedEdge<V>> currentShortPath = dijkstra.shortestPath(reduced, (V)it[i], (V)it[j]);
 				Path<V, WeightedEdge<V>> shortPath = dijkstra.shortestPath(g, (V)it[i], (V)it[j]);
-				System.out.println((V)it[i] + " " + (V)it[j]);
 				if (shortPath == null)
 					throw new IllegalArgumentException(); // cannot form mst
 				
@@ -126,9 +125,10 @@ public class MstTspApproximation<V extends Comparable<V>>
 		// DFS to pre-order traversal of the MST
 		HashSet<V> visited = new HashSet<V>();
 		directedToUndirected(mst);
-		System.out.println(mst.vertices());
+		//System.out.println(mst.vertices());
 		List<V> nodes = dfs(mst, start, visited); // make copy of verts later
-		System.out.println(nodes);
+		nodes.remove(0);
+		//System.out.println(nodes);
 		return nodes;
 		
 		/*
@@ -222,12 +222,11 @@ public class MstTspApproximation<V extends Comparable<V>>
 	private void directedToUndirected(Graph<V, WeightedEdge<V>> g)
 	{
 		Object[] it = g.vertices().toArray();
-		Iterator<V> it1 = g.vertices().iterator();
-		Iterator<V> it2 = g.vertices().iterator();
+		//Iterator<V> it1 = g.vertices().iterator();
+		//Iterator<V> it2 = g.vertices().iterator();
 		//MyDirectedGraph<V, Edge<V>> gNew = new MyDirectedGraph<V, Edge<V>>(g.vertices());
 		
 		for (int i = 0; i < it.length; i++) {
-			
 			for (int j = 0; j < it.length; j++) {
 				if (g.adjacent((V)it[i], (V)it[j]) != null)
 					g.addEdge(new WeightedEdge<V>((V)it[j], (V)it[i], 0));
