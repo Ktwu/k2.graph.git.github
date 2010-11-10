@@ -6,14 +6,23 @@ import edu.cmu.cs211.pg.game.PirateNode;
 import edu.cmu.cs211.pg.game.TreasureMap;
 import edu.cmu.cs211.pg.bots.student.MyTreasureMap;
 
+import java.util.HashSet;
+
 public class MyFirstCartographerPirate implements Pirate
 {
 	private MyTreasureMap map;
+	private int numberOfNodes;
+	HashSet<PirateNode> traversedNods;
 	
 	public void init(TreasureMap _map, GameInformation game)
 	{
 		this.map = (MyTreasureMap)_map;
-		throw new RuntimeException ("You need to implement this method");
+		
+		// Set up the nodes where we have gold
+		numberOfNodes = game.numberOfVertices();
+		game.
+		
+		//throw new RuntimeException ("You need to implement this method");
 	}
 
 	public PirateNode next()

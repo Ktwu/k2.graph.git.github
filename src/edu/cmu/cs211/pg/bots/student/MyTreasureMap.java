@@ -31,6 +31,11 @@ public class MyTreasureMap implements TreasureMap
 	PirateNode natives = null;
 	PirateNode myloc = null;
 	
+	TreeSet<PirateNode> goldNodes = null;
+	TreeSet<PirateNode> portNodes = null;
+	
+	Map<PirateNode, WeightedEdge<PirateNode>> shortestPaths = null;
+	
 	//Other classes
 	Dijkstra dijkstra = new Dijkstra();
 	Kruskal kruskal = new Kruskal();

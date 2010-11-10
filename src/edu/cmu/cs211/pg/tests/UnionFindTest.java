@@ -102,6 +102,31 @@ public class UnionFindTest {
 		//assertEquals("Checking set size", uf.uniqueSets(), 3);
 	}
 	
+	@Test
+	public void stressTest()
+	{
+		UnionFind<Integer> uf = new UnionFind<Integer>();
+		
+		for (int i = 0; i < 30000; i+=2)
+			uf.union(i, i+1);
+		
+		for (int i = 0; i < 30000; i+=2)
+			assertEquals(uf.find(i), uf.find(i+1));
+		
+		uf.clear();
+		
+		for (int i = 0; i < 30000; i+=2)
+			uf.union(i, i+1);
+		
+		for (int i = 0; i < 30000; i+=2)
+			assertEquals(uf.find(i), uf.find(i+1));
+		
+		uf = new UnionFind<Integer>();
+		
+		for (int j = 0; j < 100; j++)
+			for (int i = 0; i < 30000; i++)
+				assertEquals(uf.find(i).equals(i), true);
+	}
 	
 	
 	// ********************** NULL TESTS **************************
