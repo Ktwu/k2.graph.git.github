@@ -3,6 +3,7 @@ package edu.cmu.cs211.pg.bots.student;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -31,10 +32,8 @@ public class MyTreasureMap implements TreasureMap
 	PirateNode natives = null;
 	PirateNode myloc = null;
 	
-	TreeSet<PirateNode> goldNodes = null;
-	TreeSet<PirateNode> portNodes = null;
-	
-	Map<PirateNode, WeightedEdge<PirateNode>> shortestPaths = null;
+	TreeSet<PirateNode> gold = new TreeSet<PirateNode>();
+	HashSet<PirateNode> traversedNodes = new HashSet<PirateNode>();
 	
 	//Other classes
 	Dijkstra dijkstra = new Dijkstra();
@@ -45,7 +44,9 @@ public class MyTreasureMap implements TreasureMap
 		PirateNode loc = t.loc;
 		myloc = loc;
 		ensureNodeAdded(t,loc);
+		traversedNodes.add(loc);
 		
+		// Look at our surroundings and try to add them to our map!
 		for( WeightedEdge<PirateNode> e : t.edges )
 		{
 			PirateNode dest = e.dest();
@@ -55,6 +56,7 @@ public class MyTreasureMap implements TreasureMap
 			island.addEdge(new WeightedEdge<PirateNode>(e.dest(),e.src(),e.weight()));
 		}
 	}
+	
 	public void ensureNodeAdded(TurnInformation t, PirateNode loc)
 	{		
 		if( t != null )
@@ -67,6 +69,10 @@ public class MyTreasureMap implements TreasureMap
 			{
 				natives = loc;
 			}
+			if (gold.contains(loc) && t.atFakeOrRealGold())
+			{
+				gold.add(loc);
+			}
 		}
 		island.addVertex(loc);
 	}
@@ -75,5 +81,27 @@ public class MyTreasureMap implements TreasureMap
 	{
 		List<PirateNode> next = new ArrayList<PirateNode>(island.outgoingNeighbors(myloc));
 		return next.get(new Random().nextInt(next.size()));
+	}
+	
+	public PirateNode travelTo(PirateNode destination)
+	{
+		return dijkstra.shortestPath(island, myloc, destination).dest();
+	}
+	
+	public PirateNode pickLowestWeightNewNode()
+	{
+		WeightedEdge<PirateNode> lowest = null;
+		Set<WeightedEdge<PirateNode>> edges = island.outgoingEdges(myloc);
+		
+		for (WeightedEdge<PirateNode> e : edges)
+		{
+			if ((lowest == null || e.weight() < lowest.weight()) 
+				&& !traversedNodes.contains(e.dest()))
+					lowest = e;
+		}
+		
+		if (lowest == null)
+			return null;
+		return lowest.dest();
 	}
 }

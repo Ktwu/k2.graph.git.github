@@ -12,6 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 
 import edu.cmu.cs211.pg.graph.Edge;
+import edu.cmu.cs211.pg.graph.WeightedEdge;
 import edu.cmu.cs211.pg.graph.MyDirectedGraph;
 
 import java.util.Set;
@@ -103,9 +104,43 @@ public class GraphTest {
 			assertEquals(edges.contains(g.adjacent(vertices[0], vertices[i])), true);	
 	}
 	
+	/**
+	 * Check that, if we add edges with different weights, we only add one
+	 */
+	@Test
+	public void weightedEdgeAddTest()
+	{
+		MyDirectedGraph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
+		assertEquals(0, g.vertices().size());
+		
+		String[] vertices = { "A", "B", "C"};
+		HashSet<Edge<String>> edges = new HashSet<Edge<String>>();
+		
+		assertEquals(g.addVertices(Arrays.asList(vertices)), true);
+		assertEquals(g.addEdge(new WeightedEdge<String>("A", "B", 1)), true);
+		assertEquals(g.addEdge(new WeightedEdge<String>("A", "B", 2)), false);
+	}
 	
-	
-	
+	/**
+	 * Check that, if we take away edges with different weights, we only remove one
+	 */
+	@Test
+	public void weightedEdgeRemoveTest()
+	{
+		MyDirectedGraph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
+		assertEquals(0, g.vertices().size());
+		
+		String[] vertices = { "A", "B", "C"};
+		HashSet<Edge<String>> edges = new HashSet<Edge<String>>();
+		
+		assertEquals(g.addVertices(Arrays.asList(vertices)), true);
+		
+		assertEquals(g.addEdge(new WeightedEdge<String>("A", "B", 1)), true);
+		assertEquals(g.addEdge(new WeightedEdge<String>("A", "B", 2)), false);
+		
+		assertEquals(g.removeEdge("A", "B"), true);
+		assertEquals(g.removeEdge("A", "B"), false);		
+	}
 	
 	@Test
 	public void simpleRemoveEdgeTest()
@@ -123,7 +158,10 @@ public class GraphTest {
 		assertEquals(g.addEdges(edges), true);
 		
 		for (int i = 1; i < vertices.length; i++)
+		{
 			assertEquals(g.removeEdge(vertices[0], vertices[i]), true);
+			assertEquals(g.removeEdge(vertices[0], vertices[i]), false);
+		}
 		
 		assertEquals(g.outgoingEdges(vertices[0]).size(), 0);
 	}

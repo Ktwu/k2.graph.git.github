@@ -20,6 +20,7 @@ public class StudentTeam implements TeamFactory
 	}
 	public String getTeamName()
 	{
-		throw new RuntimeException ("You need to implement this method");
+		return "2.0ers";
+		//throw new RuntimeException ("You need to implement this method");
 	}
 }

@@ -148,15 +148,18 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 				throw new IllegalArgumentException();
 				
 		// We're dealing with a simple graph--we can't point to ourself
-		if (adjacencyList.get(e.src).contains(e)
-			|| e.src().equals(e.dest()))
+		if (e.src().equals(e.dest()))
 				return false;
 		
-		// We don't have to iterate through our list of edges 
-		// since edges are defined to be unique only if they differ in at least src/dest
-		// Edges with the same src/dest are equal
+		// We have to iterate through our list of edges 
+		// Since we only care about whether src/dest match up
+		// But custom edges might be defined to be different otherwise
+		Set<E> edges = adjacencyList.get(e.src());
+		for (E edge : edges)
+			if (e.dest().equals(edge.dest()))
+				return false;
 		
-		adjacencyList.get(e.src).add(e);
+		adjacencyList.get(e.src()).add(e);
 		graphEdges.add(e);
 		return true;
 	}
@@ -189,7 +192,7 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		while (edges.hasNext())
 		{
 			E tempEdge = edges.next();
-			if (adjacencyList.get(src).contains(tempEdge))
+			if (tempEdge.dest().equals(dest))
 			{
 				adjacencyList.get(src).remove(tempEdge);
 				graphEdges.remove(tempEdge);
