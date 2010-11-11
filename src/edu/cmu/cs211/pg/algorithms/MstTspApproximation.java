@@ -69,7 +69,7 @@ public class MstTspApproximation<V extends Comparable<V>>
 		
 		// Do we need to come back to the start node (true cycle)?
 		boolean backToStart = false;
-		if (!verts.contains(start)) {
+		if (verts.contains(start)) {
 			backToStart = true;
 		}
 		else {
