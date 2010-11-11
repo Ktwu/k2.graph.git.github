@@ -8,9 +8,32 @@ import edu.cmu.cs211.pg.graph.*;
 import edu.cmu.cs211.pg.algorithms.Dijkstra;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class DijkstraTest {
+	
+	@Test
+	public void stressTest()
+	{
+		MyDirectedGraph<Integer,WeightedEdge<Integer>> g = new MyDirectedGraph<Integer,WeightedEdge<Integer>>();
+		Dijkstra myD = new Dijkstra();
+		Random r = new Random();
+		
+		for (int i = 0; i < 50; i++)
+			g.addVertex(Integer.valueOf(i));
+		
+		int numEdges = r.nextInt(300);
+		for (int i = 0; i < numEdges; i++)
+			g.addEdge(new WeightedEdge<Integer>(Integer.valueOf(r.nextInt(50)), Integer.valueOf(r.nextInt(50)), r.nextInt(50)));
+			
+		Map<Integer,Path<Integer, WeightedEdge<Integer>>> paths = myD.allShortestPaths(g, Integer.valueOf(49));
+		for (int i = 0; i < 49; i++) {
+			if (paths.containsKey(Integer.valueOf(i)));
+		}
+	}
 	
 	@Test (expected=NullPointerException.class)
 	public void nullGraphTest()
