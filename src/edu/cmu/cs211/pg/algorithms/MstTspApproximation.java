@@ -111,8 +111,8 @@ public class MstTspApproximation<V extends Comparable<V>>
 		// list of all nodes we visit, in order, in our traversal
 		List<V> traversal = new ArrayList<V>();
 		for (int i = 1; i < order.size(); i++)
-			traversal.addAll(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).vertices());
-		traversal.addAll(dijkstra.shortestPath(g, order.get(order.size() - 1), start).vertices());
+			traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).edges()));
+		traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(order.size() - 1), start).edges()));
 		return traversal;
 	}
 
@@ -161,5 +161,21 @@ public class MstTspApproximation<V extends Comparable<V>>
 					g.addEdge(new WeightedEdge<V>((V)it[i], (V)it[j], 0));
 			}
 		}
+	}
+
+	
+	/**
+	 * list of vertices in a path, in order
+	 * @param edges list of the edges in the path
+	 * @return list of vertices (without start vertex)
+	 */
+	private List<V> vertices (List<WeightedEdge<V>> edges)
+	{
+		List<V> nodes = new ArrayList<V>();
+		for (int i = 0; i < edges.size(); i++) {
+			nodes.add(edges.get(i).dest());
+		}
+		
+		return nodes;
 	}
 }
