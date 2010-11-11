@@ -10,6 +10,7 @@ import edu.cmu.cs211.pg.graph.WeightedEdge;
 public class GreedyCaptainPirate implements Pirate
 {
 	private MyTreasureMap map;
+	private GameInformation game;
 	
 	/**
 	 * Uses a greedy algorithm to find the gold, as quickly as possible
@@ -21,11 +22,11 @@ public class GreedyCaptainPirate implements Pirate
 	public void init(TreasureMap _map, GameInformation game)
 	{
 		this.map = (MyTreasureMap)_map;
-		throw new RuntimeException ("You need to implement this method");
+		this.game = game;	
 	}
 
 	public PirateNode next()
 	{
-		throw new RuntimeException ("You need to implement this method");
+		return map.pickRandomAdjacentNode();
 	}
 }

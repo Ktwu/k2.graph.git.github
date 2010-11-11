@@ -1,5 +1,6 @@
 package edu.cmu.cs211.pg.algorithms;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import edu.cmu.cs211.pg.graph.Graph;
@@ -181,7 +182,7 @@ public class Dijkstra
 	// The WeightedEdge compare judges on VERTICES first, not weight
 	// Since I don't know whether I should change WeightedEdge
 	// I just made a personal comparator instead
-	private static class edgeComparator<E extends WeightedEdge> implements Comparator<E>
+	private static class edgeComparator<E extends WeightedEdge> implements Comparator<E>, Serializable
 	{
 		public int compare(E o1, E o2)
 		{
