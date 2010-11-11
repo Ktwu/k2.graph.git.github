@@ -128,6 +128,21 @@ public class UnionFindTest {
 				assertEquals(uf.find(i).equals(i), true);
 	}
 	
+	// This stress test simulates the stack overflow error I got
+	// from the public stress test
+	// It first breaks around 5000 elements
+	@Test
+	public void stressFindTest()
+	{
+		UnionFind<Integer> uf = new UnionFind<Integer>();
+		
+		for (int i = 0; i < 5000; i++)
+			uf.union(i, i+1);
+		
+		
+		assertEquals(uf.find(4999), uf.find(1));
+	}
+	
 	
 	// ********************** NULL TESTS **************************
 	@Test (expected=NullPointerException.class)

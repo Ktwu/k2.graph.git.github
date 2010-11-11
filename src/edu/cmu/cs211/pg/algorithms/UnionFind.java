@@ -9,18 +9,24 @@ package edu.cmu.cs211.pg.algorithms;
 
 import java.util.Set;
 import java.util.HashMap;
-import java.util.Collection;
-import java.util.Iterator;
 
 public class UnionFind<T> 
 {	
+	// We keep track of both roots of nodes
+	// and sizes of sets
+	// We only care about the size of sets 
+	// for canonical nodes
 	HashMap<T, T> unionTree;
+	HashMap<T, Integer> unionSize;
+	
 	int setCount;
 	
 	public UnionFind() 
 	{
 		// Initialize our map
 		unionTree = new HashMap<T, T>();
+		unionSize = new HashMap<T, Integer>();
+		
 		setCount = 0;
 	}
 	
@@ -40,12 +46,21 @@ public class UnionFind<T>
 		a = find(a);
 		b = find(b);
 		
-		if (a != b)
+		int sizeA = unionSize.get(a);
+		int sizeB = unionSize.get(b);
+		
+		// We don't care if the two sets are the same size -- then it doesn't matter
+		// which guy is the new root
+		// However, we want smaller sets to point directly to the roots of larger sets
+		T newRoot = sizeB > sizeA ? b : a;
+		T newBranch = sizeB > sizeA ? a : b;
+		
+		if (!a.equals(b))
 		{
-			if (myCompare(unionTree.get(a), unionTree.get(b)) == -1)
-			{	unionTree.put(a, unionTree.get(b));	unionTree.put(b, a);	}
-			else
-			{	unionTree.put(b, unionTree.get(a));	unionTree.put(a, b);	}
+			// Our branch points to our root, and we set the size of our
+			// new root
+			unionTree.put(newBranch, newRoot);
+			unionSize.put(newRoot, sizeA + sizeB);
 			
 			setCount--;
 		}
@@ -59,7 +74,7 @@ public class UnionFind<T>
      * @throws      NullPointerException if a is null
 	 */
 	public T find(T a) 
-	{
+	{		
 		if (a == null)
 			throw new NullPointerException("find(a): a is null!");
 		
@@ -84,10 +99,12 @@ public class UnionFind<T>
 	public void clear() 
 	{
 		Set<T> temp = unionTree.keySet();
-		Iterator<T> iTemp = temp.iterator();
 		
-		while (iTemp.hasNext())
-			unionTree.put(iTemp.next(), null);
+		for(T key : temp)
+		{
+			unionTree.put(key, null);
+			unionSize.put(key, 1);
+		}
 		
 		setCount = unionTree.size();
 	}
@@ -110,7 +127,9 @@ public class UnionFind<T>
 	{
 		if (!unionTree.containsKey(a))
 		{	
-			unionTree.put(a, null);		
+			unionTree.put(a, null);	
+			unionSize.put(a, 1);
+			
 			setCount++; 
 			return true;
 		}
