@@ -21,19 +21,19 @@ public class MstTspApproximation<V extends Comparable<V>>
 {
 	private Dijkstra dijkstra;
 	private Kruskal kruskal;
-	
+
 	protected MstTspApproximation()
 	{
 		kruskal = new Kruskal();
 		dijkstra = new Dijkstra();
 	}
-	
+
 	public MstTspApproximation(Kruskal kruskal, Dijkstra dijkstra)
 	{
 		this.kruskal = kruskal;
 		this.dijkstra = dijkstra;
 	}
-	
+
 	/**
 	 * Generates a tour of a specified set of nodes in the graph using the
 	 * MST-TSP 2-competitive approximation algorithm.
@@ -66,123 +66,63 @@ public class MstTspApproximation<V extends Comparable<V>>
 	{
 		if (g == null || verts == null || start == null)
 			throw new NullPointerException("Null parameter to approximateTour()");
-		
-		Iterator<V> blah = verts.iterator();
-		System.out.println(dijkstra.shortestPath(g, blah.next(), blah.next()));
-		System.out.println(kruskal.MST(g));
-		
-		/*// check if every element in
-		HashSet<V> vertsCopy = new HashSet<V>(verts);
-		vertsCopy.removeAll(g.vertices());
-		if (!vertsCopy.isEmpty())
-			throw new IllegalArgumentException();*/
-		
-		// turn graph into a new graph containing only the vertices in verts
-		//Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
-		
-		// This makes copying the graph a lot simpler
-		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(g);
+
+		// we need start in the set for the MST in order to make a cycle
+		if (!verts.contains(start)) {
+			verts = new HashSet<V>(verts); 
+			verts.add(start);
+		}
+
+		// form basic graph of ONLY verts with all edges directly between vertices
+		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
 		Object[] it = verts.toArray();
-		
-		// form basic graph with all edges directly between vertices
-		/*Object[] it = verts.toArray();
 		for (int i = 0; i < it.length; i++) {
 			for (int j = 0; j < it.length; j++) {
 				if (i == j)
 					continue;
-				
+
 				WeightedEdge<V> newEdge = g.adjacent((V)it[i], (V)it[j]);
 				if (newEdge != null)
 					reduced.addEdge(newEdge);
 			}
-		}*/
-		
+		}
+
 		// add on edges that do not exist in current graph
 		for (int i = 0; i < it.length; i++) {
 			for (int j = 0; j < it.length; j++) {
 				if (j == i)
 					continue;
-				
+
 				Path<V, WeightedEdge<V>> currentShortPath = dijkstra.shortestPath(reduced, (V)it[i], (V)it[j]);
 				Path<V, WeightedEdge<V>> shortPath = dijkstra.shortestPath(g, (V)it[i], (V)it[j]);
-				System.out.println((V)it[i] + " " + (V)it[j]);
 				if (shortPath == null)
 					throw new IllegalArgumentException(); // cannot form mst
-				
+
 				if (currentShortPath == null || 
 						shortPath.pathWeight() < currentShortPath.pathWeight()) {
 					reduced.addEdge(new WeightedEdge<V>((V)it[i], (V)it[j], shortPath.pathWeight()));
 				}
 			}
 		}
-		
+
 		// Kruskal's to find MST of reduced graph
 		Graph<V,WeightedEdge<V>> mst = kruskal.MST(reduced);
-		
-		/*// graph is complete, but just in case ...
-		if (mst == null)
-			throw new IllegalArgumentException();*/
 
 		// DFS to pre-order traversal of the MST
 		HashSet<V> visited = new HashSet<V>();
 		directedToUndirected(mst);
-		System.out.println(mst.vertices());
-		List<V> nodes = dfs(mst, start, visited); // make copy of verts later
-		System.out.println(nodes);
-		return nodes;
-		
-		/*
-		// Return only the nodes we need
-		LinkedList<V> ret = new LinkedList<V>();
-		Iterator<V> it_nodes = nodes.iterator();
-		V prev = null;
-		if (it_nodes.hasNext())
-			prev = it_nodes.next();
-		
-		while (it_nodes.hasNext()) {
-			V next = it_nodes.next();
-			if (verts.contains(next)) {
-				if (dijkstra.shortestPath(g, prev, next) == null) System.out.println("n: " + prev + " " + next);
-				ret.addAll(dijkstra.shortestPath(g, prev, next).vertices());
-			}
-		}
-		
-		System.out.println(ret);
-		
-		// move the first vertex to the end of the cycle
-		if (!ret.isEmpty()) {
-			ret.add(ret.poll());
-		}
+		List<V> order = dfs(mst, start, visited); // the order in which we visit the nodes needed
+		order.add(start);
 
-		
-		System.out.println(ret);
-		
-		return ret;*/
-	}
-	
-	private List<V> dfs(Graph<V, WeightedEdge<V>> mst, V start, Set<V> visited)
-	{
-		visited.add(start);
-		
-		List<V> ret = new ArrayList<V>();
-		ret.add(start);
+		// list of all nodes we visit, in order, in our traversal
+		List<V> traversal = new ArrayList<V>();
+		for (int i = 1; i < order.size(); i++)
+			traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).edges()));
+		traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(order.size() - 1), start).edges()));
 
-		PriorityQueue<V> neighbors = new PriorityQueue<V>(mst.outgoingNeighbors(start));
-		while (!neighbors.isEmpty()) {
-			V neighbor = neighbors.poll();
-			
-			// Have we already looked at the node?
-			if (!visited.contains(neighbor)) {
-				
-				// Traverse via preorder -- add nodes once we've added their children
-				ret.addAll(dfs(mst, neighbor, visited));
-				ret.add(start);
-			}
-		}
-		
-		return ret;
+		return traversal;
 	}
-	
+
 	/**
 	 * Depth First Search of a graph, to iterate through the MST
 	 * 
@@ -190,30 +130,27 @@ public class MstTspApproximation<V extends Comparable<V>>
 	 * @param start the node we are searching from now
 	 * @return a list of all nodes in g, preordered by depth first search
 	 */
-	/*
-	private ArrayList<V> dfs(Graph<V, WeightedEdge<V>> mst, Set<V> unvisited, Graph<V, WeightedEdge<V>> g, V start)
+	private List<V> dfs(Graph<V, WeightedEdge<V>> mst, V start, Set<V> visited)
 	{
-		Set<V> neighbors = mst.outgoingNeighbors(start);
-		System.out.println(neighbors);
-		unvisited.remove(start);
-		neighbors.retainAll(unvisited);
-		System.out.println(neighbors);
-		
-		// sort neighbors by natural ordering
-		PriorityQueue<V> pq = new PriorityQueue<V>(neighbors);
-		ArrayList<V> ret = new ArrayList<V>();
-		
-		// recurse over each neighbor
-		while (!pq.isEmpty()) {
-			V next = pq.poll();
-			ret.addAll(dijkstra.shortestPath(g, start, next).vertices());
-			ret.addAll(dfs(mst, unvisited, g, next));
+		visited.add(start);
+
+		List<V> ret = new ArrayList<V>();
+		ret.add(start);
+
+		PriorityQueue<V> neighbors = new PriorityQueue<V>(mst.outgoingNeighbors(start));
+		while (!neighbors.isEmpty()) {
+			V neighbor = neighbors.poll();
+
+			// Have we already looked at the node?
+			if (!visited.contains(neighbor)) {
+				// Traverse via preorder
+				ret.addAll(dfs(mst, neighbor, visited));
+			}
 		}
-			
+
 		return ret;
 	}
-	*/
-	
+
 	/**
 	 * Turn a directed weighted graph into, practically, an undirected unweighted graph
 	 * by adding opposite-direction edges for each edge with weights of 0
@@ -222,12 +159,8 @@ public class MstTspApproximation<V extends Comparable<V>>
 	private void directedToUndirected(Graph<V, WeightedEdge<V>> g)
 	{
 		Object[] it = g.vertices().toArray();
-		Iterator<V> it1 = g.vertices().iterator();
-		Iterator<V> it2 = g.vertices().iterator();
-		//MyDirectedGraph<V, Edge<V>> gNew = new MyDirectedGraph<V, Edge<V>>(g.vertices());
-		
+
 		for (int i = 0; i < it.length; i++) {
-			
 			for (int j = 0; j < it.length; j++) {
 				if (g.adjacent((V)it[i], (V)it[j]) != null)
 					g.addEdge(new WeightedEdge<V>((V)it[j], (V)it[i], 0));
@@ -235,5 +168,21 @@ public class MstTspApproximation<V extends Comparable<V>>
 					g.addEdge(new WeightedEdge<V>((V)it[i], (V)it[j], 0));
 			}
 		}
+	}
+
+
+	/**
+	 * list of vertices in a path, in order
+	 * @param edges list of the edges in the path
+	 * @return list of vertices (without start vertex)
+	 */
+	private List<V> vertices (List<WeightedEdge<V>> edges)
+	{
+		List<V> nodes = new ArrayList<V>();
+		for (int i = 0; i < edges.size(); i++) {
+			nodes.add(edges.get(i).dest());
+		}
+
+		return nodes;
 	}
 }

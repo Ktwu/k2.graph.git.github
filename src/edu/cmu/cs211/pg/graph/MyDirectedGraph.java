@@ -148,8 +148,10 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 				throw new IllegalArgumentException();
 				
 		// We're dealing with a simple graph--we can't point to ourself
-		if (e.src().equals(e.dest()))
-				return false;
+		// But the staff code seems to say that you CAN add edges to yourself...
+		// Utter confusion...
+		// if (e.src().equals(e.dest()))
+		//		return false;
 		
 		// We have to iterate through our list of edges 
 		// Since we only care about whether src/dest match up

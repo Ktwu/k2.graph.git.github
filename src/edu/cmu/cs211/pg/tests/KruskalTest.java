@@ -105,5 +105,44 @@ public class KruskalTest {
 		
 	}
 	
+	@Test (expected=NullPointerException.class)
+	public void nullGraphTest()
+	{
+		Kruskal k = new Kruskal();
+		
+		MyDirectedGraph<String,WeightedEdge<String>> g = null;
+		k.MST(g);
+		fail();
+	}
 	
+	/**
+	 * Does anything break if I add a lot of elements?
+	 */
+	@Test
+	public void stressTest()
+	{
+		Kruskal k = new Kruskal();
+		
+		Graph<Integer,WeightedEdge<Integer>> g = new MyDirectedGraph<Integer,WeightedEdge<Integer>>();
+		
+		g.addVertex(0);
+		for (int i = 1; i < 10000; i++)
+		{
+			assertEquals(g.addVertex(i), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i-1, i, 3)), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i, i-1, 2)), true);
+		}
+		
+		// Check that we have all the vertices
+		g = k.MST(g);
+		assertEquals(10000, g.vertices().size());
+		
+		// Check that we contain all the lower weight edges
+		// and none of the heavier edges
+		for (int i = 1; i < 10000; i++)
+		{
+			assertEquals(g.adjacent(i, i-1).weight(), 2);
+			assertEquals(g.adjacent(i-1, i), null);
+		}
+	}
 }

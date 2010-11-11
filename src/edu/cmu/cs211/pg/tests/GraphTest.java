@@ -351,8 +351,9 @@ public class GraphTest {
 			new MyDirectedGraph<String,Edge<String>>(Arrays.asList(vertex));
 		
 		// Can't add edges to ourself
+		// SO CAN OR CAN WE NOT ADD EDGES TO OURSELF???
 		for (int i = 0; i < vertex.length; i++)
-			assertEquals(g.addEdge(new Edge<String>(vertex[i], vertex[i])), false);
+			assertEquals(g.addEdge(new Edge<String>(vertex[i], vertex[i])), true);
 		
 		// Can't add multiple edges between nodes
 		for (int i = 1; i < vertex.length; i++)

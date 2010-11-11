@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class DijkstraTest {
 	
+	/*************************** NULL TESTS *********************************/
 	@Test (expected=NullPointerException.class)
 	public void nullGraphTest()
 	{
@@ -38,6 +39,12 @@ public class DijkstraTest {
 		myD.shortestPath(g, "A", null);	
 	}
 	
+	
+	
+	
+	/**
+	 * Do we return null if there is no path between two nodes?
+	 */
 	@Test
 	public void noPathTest()
 	{
@@ -49,6 +56,11 @@ public class DijkstraTest {
 		assertEquals(myD.shortestPath(g, "A", "B"), null);
 	}
 	
+	/**
+	 * If our graph has a negative edge
+	 * even if we never consider it from a given node
+	 * we still want to throw an illegalArgumentException
+	 */
 	@Test (expected=IllegalArgumentException.class)
 	public void negativeEdgeTest()
 	{
@@ -93,6 +105,9 @@ public class DijkstraTest {
 		fail();
 	}
 	
+	/**
+	 * Simplest case
+	 */
 	@Test 
 	public void sanityTest()
 	{
@@ -109,6 +124,10 @@ public class DijkstraTest {
 		assertEquals(myD.shortestPath(g, "A", "C").pathWeight(), 2);
 	}
 	
+	/**
+	 * Using a more complex graph I found on Wikipedia, which demonstrated
+	 * what Dijkstra's should return on this given graph
+	 */
 	@Test
 	public void complexTest()
 	{
@@ -196,5 +215,31 @@ public class DijkstraTest {
 		assertEquals(myMap.get("c").vertices(), Arrays.asList("e", "c"));
 		assertEquals(myMap.get("d").vertices(), Arrays.asList("e", "d"));
 		assertEquals(myMap.get("e").vertices(), Arrays.asList("e"));*/
+	}
+	
+	// This code helped me realize to ALWAYS USE equals() instead of ==
+	// unless I'm sure I'm dealing with primitives
+	@Test
+	public void stressTest()
+	{
+		Graph<Integer,WeightedEdge<Integer>> g = new MyDirectedGraph<Integer,WeightedEdge<Integer>>();
+		
+		g.addVertex(0);
+		for (int i = 1; i < 1000; i++)
+		{
+			assertEquals(g.addVertex(i), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i-1, i, 3)), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i, i-1, 2)), true);
+		}
+		
+		Dijkstra myD = new Dijkstra();
+		for (int i = 1; i < 1000; i++)
+		{
+			Path<Integer, WeightedEdge<Integer>> path = myD.shortestPath(g, 0, i);
+			assertEquals(path.pathWeight(), i*3);
+			
+			path = myD.shortestPath(g, i, 0);
+			assertEquals(path.pathWeight(), i*2);
+		}
 	}
 }

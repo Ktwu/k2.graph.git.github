@@ -88,7 +88,7 @@ public class Dijkstra
 			distanceMap.put(tempNode, Integer.MAX_VALUE);
 			previousMap.put(tempNode, start);
 			
-			if (tempNode == start)
+			if (tempNode.equals(start))
 				childrenEdges.add(new WeightedEdge<V>(start, tempNode, 0));
 			else
 				childrenEdges.add(new WeightedEdge<V>(start, tempNode, Integer.MAX_VALUE));
@@ -129,7 +129,7 @@ public class Dijkstra
 			
 			if (returnMap.get(tempEdge.src()) == null)
 				returnMap.put(tempEdge.dest(), new Path<V,E>(start).cons(tempEdge));
-			else if (tempEdge.dest() != start)
+			else if (!tempEdge.dest().equals(start))
 				returnMap.put(tempEdge.dest(), returnMap.get(tempEdge.src()).cons(tempEdge));
 			
 			V tempNode = tempEdge.dest();
