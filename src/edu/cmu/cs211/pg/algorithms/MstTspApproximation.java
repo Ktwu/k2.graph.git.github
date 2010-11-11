@@ -67,6 +67,17 @@ public class MstTspApproximation<V extends Comparable<V>>
 		if (g == null || verts == null || start == null)
 			throw new NullPointerException("Null parameter to approximateTour()");
 		
+		// Do we need to come back to the start node (true cycle)?
+		boolean backToStart = false;
+		if (!verts.contains(start)) {
+			backToStart = true;
+		}
+		else {
+			// we need start in there anyway, for the MST
+			verts = new HashSet<V>(verts); 
+			verts.add(start);
+		}
+		
 		// form basic graph of ONLY verts with all edges directly between vertices
 		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
 		Object[] it = verts.toArray();
@@ -112,7 +123,10 @@ public class MstTspApproximation<V extends Comparable<V>>
 		List<V> traversal = new ArrayList<V>();
 		for (int i = 1; i < order.size(); i++)
 			traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).edges()));
-		traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(order.size() - 1), start).edges()));
+		
+		if (backToStart)
+			traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(order.size() - 1), start).edges()));
+		
 		return traversal;
 	}
 
