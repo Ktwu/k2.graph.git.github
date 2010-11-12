@@ -15,39 +15,49 @@ import java.util.Set;
 public class MyFirstCartographerPirate implements Pirate
 {
 	private MyTreasureMap map;
+	private GameInformation game;
 	
-	private int numberOfNodes;
 	private int numberOfTurns;
 	
 	public void init(TreasureMap _map, GameInformation game)
 	{
 		this.map = (MyTreasureMap)_map;
-		numberOfNodes = game.numberOfVertices();
-		numberOfTurns  = game.lengthOfPhaseOne();
-		
-		//throw new RuntimeException ("You need to implement this method");
+		this.game = game;
+	
+		numberOfTurns  = 0;
 	}
 
 	// We essentially implement depth-first search
 	// Priority is given to the edge with least weight
+	// So this means that our cartographer is GREEDY
 	public PirateNode next()
 	{
-		PirateNode travelTo = null;
-		
-		// Figure our where we want to go
-		if (map.traversedNodes.size() == numberOfNodes)
-			travelTo = map.travelTo(map.port);
-		else
+		// Go back to port if phase 2 is about to begin
+		// We use a simple heuristic for determining if we have enough time to 
+		// go back to port
+		if (game.lengthOfPhaseOne()/3 * 2 <= numberOfTurns)
 		{
-			travelTo = map.pickLowestWeightNewNode();
+			// reset our map and nitrite flag
+			// since our captains will need to make use of DFS
+			// and will need to find the nitrite themselves
+			map.resetDFS();
+			map.hasNitrite = false;
 			
-			if (travelTo == null)
-				travelTo = map.travelTo(map.port);
+			return map.travelTo(map.port);
 		}
 		
-		numberOfTurns -= map.island.adjacent(map.myloc, travelTo).weight();
+		// Otherwise explore the island via DFS
+		PirateNode travelTo = map.DFS();
+		
+		// Increase our timer
+		if (travelTo != null)
+			numberOfTurns += map.island.adjacent(map.myloc, travelTo).weight();
+		else
+		{
+			map.hasNitrite = false;
+			map.resetDFS();
+		}
 		
 		return travelTo;
-		//throw new RuntimeException ("You need to implement this method");
 	}
 }

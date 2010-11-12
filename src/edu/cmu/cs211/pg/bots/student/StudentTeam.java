@@ -4,11 +4,16 @@ import edu.cmu.cs211.pg.game.Pirate;
 import edu.cmu.cs211.pg.game.TeamFactory;
 import edu.cmu.cs211.pg.game.TreasureMap;
 
+/**
+ * MstTeam: Pirate team that uses our Greedy Pirate Captain
+ * @author Kellie
+ *
+ */
 public class StudentTeam implements TeamFactory
 {
 	public Pirate getCartographerPirate()
 	{
-		return new MyFirstCartographerPirate();
+		return new GreedyCartographerPirate();
 	}
 	public Pirate getCaptainPirate()
 	{
@@ -20,7 +25,6 @@ public class StudentTeam implements TeamFactory
 	}
 	public String getTeamName()
 	{
-		return "2.0ers";
-		//throw new RuntimeException ("You need to implement this method");
+		return "PresentCatt";
 	}
 }

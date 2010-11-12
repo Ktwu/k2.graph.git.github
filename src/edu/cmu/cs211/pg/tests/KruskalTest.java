@@ -17,6 +17,9 @@ import java.util.Arrays;
 
 public class KruskalTest {
 
+	/**
+	 * Test that our Kruskal algorithm actually works
+	 */
 	@Test
 	public void sanityTest()
 	{
@@ -47,6 +50,9 @@ public class KruskalTest {
 				mst.adjacent("A", "C"), null);
 	}
 	
+	/**
+	 * What happens if we can't form a MST?
+	 */
 	@Test
 	public void noMstTest()
 	{
@@ -69,6 +75,30 @@ public class KruskalTest {
 		assertEquals("MST should be null", mst, null);
 	}
 	
+	/**
+	 * I shouldn't be able to find an MST of a single vertex...or...should I?
+	 */
+	@Test
+	public void singleVertexTest()
+	{
+		Kruskal k = new Kruskal();
+		
+		MyDirectedGraph<String,WeightedEdge<String>> g = new MyDirectedGraph<String,WeightedEdge<String>>();
+		assertEquals(0, g.vertices().size());
+		
+		String[] vertices = { "A" };
+		HashSet<WeightedEdge<String>> edges = new HashSet<WeightedEdge<String>>();
+		
+		assertEquals(g.addVertices(Arrays.asList(vertices)), true);
+	
+		Graph<String, WeightedEdge<String>> mst = k.MST(g);
+		assertEquals("MST should just be the single vertex", mst.vertices().size(), 1);
+		assertEquals("MST should have no edges", mst.outgoingEdges("A").size(), 0);
+	}
+	
+	/**
+	 * Does Kruskal work when we have directed edges?
+	 */
 	@Test
 	public void doubleEdgeTest()
 	{
@@ -105,6 +135,9 @@ public class KruskalTest {
 		
 	}
 	
+	/**
+	 * We should throw an exception given a null graph
+	 */
 	@Test (expected=NullPointerException.class)
 	public void nullGraphTest()
 	{

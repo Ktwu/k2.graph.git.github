@@ -58,16 +58,18 @@ public class Dijkstra
 			|| g == null)
 				throw new NullPointerException("allShortestPaths(g, start): null argument!");
 			
-			if (!contains(g, start))
-					throw new IllegalArgumentException("allShortestPaths(g, start): g does not contain start!");
+		if (!contains(g, start))
+				throw new IllegalArgumentException("allShortestPaths(g, start): g does not contain start!");
 			
-			
-			
-			
+				
 		// Create our priority queues for processed children
+		// with our private comparator
 		PriorityQueue<WeightedEdge<V>> childrenEdges = 
 			new PriorityQueue<WeightedEdge<V>>(10, new edgeComparator<WeightedEdge<V>>());
 		
+		// We keep two hashmaps
+		// One tells us the total distance from our origin
+		// And the other tells us which node points to a node in our path
 		HashMap<V, Integer> distanceMap = new HashMap<V, Integer>();
 		HashMap<V, V> previousMap = new HashMap<V, V>();
 		
@@ -75,14 +77,12 @@ public class Dijkstra
 		HashMap<V, Path<V,E>> returnMap = new HashMap<V, Path<V, E>>();
 		
 		
-		
-		
 		// First, we add all of our nodes to our map
-		// Pretend nothing is connected and set to infinite (MAX_VALUE)
-		Iterator<V> iterate = g.vertices().iterator();
-		while (iterate.hasNext())
+		// Pretend everything is connect to the original node
+		// and set distance to infinite (MAX_VALUE)
+		Set<V> nodes = g.vertices();
+		for (V tempNode : nodes)
 		{
-			V tempNode = iterate.next();
 			returnMap.put(tempNode, null);
 			
 			distanceMap.put(tempNode, Integer.MAX_VALUE);
@@ -99,8 +99,6 @@ public class Dijkstra
 				if (edge.weight() < 0)
 					throw new IllegalArgumentException("Found negative edge weight in Dijkstra's");
 		}
-		
-		
 		
 		
 		// Add all of our start edges to our queue
@@ -120,13 +118,15 @@ public class Dijkstra
 			
 			// Rework our edge into something that we can add to our path
 			// Meaning, it's the original edge from the graph
+			// It's not pretty, I know :/
 			tempEdge = (E)new WeightedEdge<V>
 				(previousMap.get(tempEdge.dest()), 
 				 tempEdge.dest(), 
 				 tempEdge.weight() - distanceMap.get(previousMap.get(tempEdge.dest())));
 			
-			//tempEdge = g.adjacent(previousMap.get(tempEdge.dest()), tempEdge.dest());
-			
+			// If we don't have a path
+			// Create a new one from the path of our previous node and our new edge
+			// Else relax the path to make it shorter
 			if (returnMap.get(tempEdge.src()) == null)
 				returnMap.put(tempEdge.dest(), new Path<V,E>(start).cons(tempEdge));
 			else if (!tempEdge.dest().equals(start))
@@ -135,26 +135,24 @@ public class Dijkstra
 			V tempNode = tempEdge.dest();
 			
 			// relax the edges we can reach	
-			Iterator<E> iEdge = g.outgoingEdges(tempNode).iterator();
-			while (iEdge.hasNext())
+			Set<E> iEdge = g.outgoingEdges(tempNode);
+			for (E tempEdge2 : iEdge)
 			{
-				tempEdge = iEdge.next();
-				
 				// Check the edge's cost
-				if (tempEdge.weight() < 0)
+				if (tempEdge2.weight() < 0)
 					throw new IllegalArgumentException();
 				
 				// We only relax if the edge's weight is less than what we have
-				int localWeight = tempEdge.weight() + distanceMap.get(tempEdge.src());
-				int oldWeight = distanceMap.get(tempEdge.dest());
+				int localWeight = tempEdge2.weight() + distanceMap.get(tempEdge2.src());
+				int oldWeight = distanceMap.get(tempEdge2.dest());
 				if (localWeight < oldWeight)
 				{
 					// When relaxing edges, we first have to remove the node from our queue
 					// Also, we reset weights
-					childrenEdges.remove(new WeightedEdge<V>(start, tempEdge.dest(), oldWeight));
-					distanceMap.put(tempEdge.dest(), localWeight);
-					childrenEdges.add(new WeightedEdge<V>(start, tempEdge.dest(), localWeight));
-					previousMap.put(tempEdge.dest(), tempEdge.src());
+					childrenEdges.remove(new WeightedEdge<V>(start, tempEdge2.dest(), oldWeight));
+					distanceMap.put(tempEdge2.dest(), localWeight);
+					childrenEdges.add(new WeightedEdge<V>(start, tempEdge2.dest(), localWeight));
+					previousMap.put(tempEdge2.dest(), tempEdge2.src());
 				}
 			}
 		}

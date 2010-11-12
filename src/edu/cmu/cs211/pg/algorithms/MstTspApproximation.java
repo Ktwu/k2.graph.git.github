@@ -1,17 +1,11 @@
 package edu.cmu.cs211.pg.algorithms;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.TreeSet;
 
-import edu.cmu.cs211.pg.graph.Edge;
 import edu.cmu.cs211.pg.graph.Graph;
 import edu.cmu.cs211.pg.graph.MyDirectedGraph;
 import edu.cmu.cs211.pg.graph.Path;
@@ -76,16 +70,6 @@ public class MstTspApproximation<V extends Comparable<V>>
 		// form basic graph of ONLY verts with all edges directly between vertices
 		Graph<V, WeightedEdge<V>> reduced = new MyDirectedGraph<V, WeightedEdge<V>>(verts);
 		Object[] it = verts.toArray();
-		for (int i = 0; i < it.length; i++) {
-			for (int j = 0; j < it.length; j++) {
-				if (i == j)
-					continue;
-
-				WeightedEdge<V> newEdge = g.adjacent((V)it[i], (V)it[j]);
-				if (newEdge != null)
-					reduced.addEdge(newEdge);
-			}
-		}
 
 		// add on edges that do not exist in current graph
 		for (int i = 0; i < it.length; i++) {
@@ -93,15 +77,11 @@ public class MstTspApproximation<V extends Comparable<V>>
 				if (j == i)
 					continue;
 
-				Path<V, WeightedEdge<V>> currentShortPath = dijkstra.shortestPath(reduced, (V)it[i], (V)it[j]);
 				Path<V, WeightedEdge<V>> shortPath = dijkstra.shortestPath(g, (V)it[i], (V)it[j]);
 				if (shortPath == null)
 					throw new IllegalArgumentException(); // cannot form mst
 
-				if (currentShortPath == null || 
-						shortPath.pathWeight() < currentShortPath.pathWeight()) {
-					reduced.addEdge(new WeightedEdge<V>((V)it[i], (V)it[j], shortPath.pathWeight()));
-				}
+				reduced.addEdge(new WeightedEdge<V>((V)it[i], (V)it[j], shortPath.pathWeight()));
 			}
 		}
 
@@ -118,7 +98,6 @@ public class MstTspApproximation<V extends Comparable<V>>
 		List<V> traversal = new ArrayList<V>();
 		for (int i = 1; i < order.size(); i++)
 			traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(i - 1), order.get(i)).edges()));
-		traversal.addAll(vertices(dijkstra.shortestPath(g, order.get(order.size() - 1), start).edges()));
 
 		return traversal;
 	}
@@ -169,7 +148,6 @@ public class MstTspApproximation<V extends Comparable<V>>
 			}
 		}
 	}
-
 
 	/**
 	 * list of vertices in a path, in order

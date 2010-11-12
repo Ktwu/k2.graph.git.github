@@ -38,6 +38,7 @@ public class Kruskal
 		
 		int numEdges = 0; // we count the number of edges in the final MST
 		
+		// Set up our return graph and our union find
 		Graph<V,E> kruskal = new MyDirectedGraph<V,E>(g);
 		UnionFind<V> uf = new UnionFind<V>();
 				
@@ -50,6 +51,7 @@ public class Kruskal
 		while (iNodes.hasNext())
 			edges.addAll(g.outgoingEdges(iNodes.next()));
 		
+		// Remove all the edges from our new graph!
 		kruskal.clearEdges();
 		
 		// Just go through our edges and select the least weighted ones first
@@ -68,7 +70,8 @@ public class Kruskal
 		}
 		
 		// Check that we've connected all of our nodes
-		if (uf.uniqueSets() != 1)
+		// (if we were given a single node, then we have 0 unique sets)
+		if (uf.uniqueSets() > 1)
 			return null;
 		
 		// check that |V| = |E| + 1

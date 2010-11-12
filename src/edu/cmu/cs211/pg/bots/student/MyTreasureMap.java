@@ -1,14 +1,8 @@
 package edu.cmu.cs211.pg.bots.student;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.Stack;
 
 import edu.cmu.cs211.pg.algorithms.Dijkstra;
 import edu.cmu.cs211.pg.algorithms.Kruskal;
@@ -17,23 +11,33 @@ import edu.cmu.cs211.pg.game.TreasureMap;
 import edu.cmu.cs211.pg.game.TurnInformation;
 import edu.cmu.cs211.pg.graph.Graph;
 import edu.cmu.cs211.pg.graph.MyDirectedGraph;
-import edu.cmu.cs211.pg.graph.Path;
 import edu.cmu.cs211.pg.graph.WeightedEdge;
 /**
  * A partial implementation of a storage structure for information during the game
  * 
- * NOTE: You can change anything you like in this class...this is only a sample partial implementation.
+ * Our TreasureMap is our data storage class.
+ * Using it, we determine what our island is,
+ * where everything is,
+ * and which nodes we've checked for gold
  */
 public class MyTreasureMap implements TreasureMap
 {	
 	//Interesting state
 	Graph<PirateNode,WeightedEdge<PirateNode>> island = new MyDirectedGraph<PirateNode,WeightedEdge<PirateNode>>();
-	PirateNode port = null;
-	PirateNode natives = null;
-	PirateNode myloc = null;
 	
-	TreeSet<PirateNode> gold = new TreeSet<PirateNode>();
-	HashSet<PirateNode> traversedNodes = new HashSet<PirateNode>();
+	// Stuff to keep track of the location of
+	PirateNode port = null;
+	PirateNode nitrite = null;
+	PirateNode myloc = null;
+	Stack<PirateNode> gold = new Stack<PirateNode>();
+	
+	// Now what have we actually found?
+	boolean hasNitrite = false;
+	boolean hasRealGold = false;
+	
+	// We need some variables for running DFS on our map
+	HashSet<PirateNode> traverseDFS = new HashSet<PirateNode>();
+	Stack<PirateNode> queuedDFS = new Stack<PirateNode>();
 	
 	//Other classes
 	Dijkstra dijkstra = new Dijkstra();
@@ -44,13 +48,22 @@ public class MyTreasureMap implements TreasureMap
 		PirateNode loc = t.loc;
 		myloc = loc;
 		ensureNodeAdded(t,loc);
-		traversedNodes.add(loc);
+		
+		// We've traversed the node we're at!
+		traverseDFS.add(loc);
+		
+		// Did we strike gold?
+		if (t.haveRealGold())
+			hasRealGold = true;
+		if (t.atNatives())
+			hasNitrite = true;
 		
 		// Look at our surroundings and try to add them to our map!
 		for( WeightedEdge<PirateNode> e : t.edges )
 		{
 			PirateNode dest = e.dest();
 			ensureNodeAdded(null,dest);
+			
 			//add edge and symmetric edge
 			island.addEdge(new WeightedEdge<PirateNode>(e.src(),e.dest(),e.weight()));
 			island.addEdge(new WeightedEdge<PirateNode>(e.dest(),e.src(),e.weight()));
@@ -62,46 +75,85 @@ public class MyTreasureMap implements TreasureMap
 		if( t != null )
 		{
 			if( port == null && t.atPort() )
-			{
 				port = loc;
-			}
-			if( natives == null && t.atNatives() )
-			{
-				natives = loc;
-			}
-			if (gold.contains(loc) && t.atFakeOrRealGold())
-			{
+
+			if (!gold.contains(loc) && t.atFakeOrRealGold())
 				gold.add(loc);
-			}
+			
+			if( nitrite == null && t.atNatives() )
+				nitrite = loc;
 		}
 		island.addVertex(loc);
 	}
 	
-	public PirateNode pickRandomAdjacentNode()
-	{
-		List<PirateNode> next = new ArrayList<PirateNode>(island.outgoingNeighbors(myloc));
-		return next.get(new Random().nextInt(next.size()));
-	}
-	
+	// Do you know where you're going?  There's a method for that
+	// Meaning that, this method will tell you where to go
 	public PirateNode travelTo(PirateNode destination)
 	{
-		return dijkstra.shortestPath(island, myloc, destination).dest();
+		// If we're already at our destination, return null -- we've already found it!
+		if (destination.equals(myloc))
+			return null;
+		
+		return dijkstra.shortestPath(island, myloc, destination).edges().get(0).dest();
 	}
 	
-	public PirateNode pickLowestWeightNewNode()
+	// When filling out our map
+	// Use DFS to determine how we traverse our map!
+	// We're biased towards edges with the smallest weight
+	public PirateNode DFS()
 	{
 		WeightedEdge<PirateNode> lowest = null;
 		Set<WeightedEdge<PirateNode>> edges = island.outgoingEdges(myloc);
 		
 		for (WeightedEdge<PirateNode> e : edges)
 		{
+			// We don't consider nodes that we've already been to
+			// Or edges that weigh more than our chosen edge
 			if ((lowest == null || e.weight() < lowest.weight()) 
-				&& !traversedNodes.contains(e.dest()))
+				&& !traverseDFS.contains(e.dest()))
 					lowest = e;
 		}
 		
 		if (lowest == null)
-			return null;
+		{
+			// If our stack is empty
+			// Then we're done traveling through our map
+			// So return null
+			if (queuedDFS.isEmpty())
+				return null;
+			else
+				return queuedDFS.pop();
+		}
+		else
+			queuedDFS.push(myloc);
+		
 		return lowest.dest();
+	}
+	
+	// Reset our map for DFS search
+	public void resetDFS()
+	{
+		queuedDFS.clear();
+		traverseDFS.clear();
+	}
+	
+	// Have we found all of our nodes?
+	public boolean foundAllGold()
+	{
+		if (gold.size() == 3)
+			return true;
+		return false;
+	}
+	
+	// Have we found real gold?
+	public boolean foundRealGold()
+	{
+		return hasRealGold;
+	}
+	
+	// How about nitrite?  Do we have that?
+	public boolean foundNitrite()
+	{
+		return hasNitrite;
 	}
 }

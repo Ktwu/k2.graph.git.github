@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import edu.cmu.cs211.pg.bots.given.BrainSlugsTeam;
 import edu.cmu.cs211.pg.bots.student.StudentTeam;
+import edu.cmu.cs211.pg.bots.student.MstTeam;
 import edu.cmu.cs211.pg.game.Game;
 import edu.cmu.cs211.pg.game.GameInformation;
 import edu.cmu.cs211.pg.game.IllegalMoveException;
@@ -22,7 +23,7 @@ public class FullGameTester
 	@Test
 	public void brainSlugs() throws IllegalMoveException
 	{
-		runXGames(500, new BrainSlugsTeam(), new StudentTeam());
+		runXGames(500, new MstTeam(), new StudentTeam());
 	}
 	
 	public void runXGames(int number, TeamFactory robotTeam, TeamFactory studentTeam) throws IllegalMoveException

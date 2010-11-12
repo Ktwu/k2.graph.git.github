@@ -18,10 +18,10 @@ public class CaptainBrainSlug implements Pirate
 		this.game = _game;
 	}
 
-	/* Do a random walk of the map*/
+	/* Do a DFS walk of the map */
 	public PirateNode next()
 	{
-		return map.pickRandomAdjacentNode();
+		return map.DFS();
 	}
 
 }

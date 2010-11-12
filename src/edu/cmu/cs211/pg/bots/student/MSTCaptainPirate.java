@@ -16,6 +16,7 @@ public class MSTCaptainPirate implements Pirate
 	@SuppressWarnings("unused")
 	private GameInformation game;
 	private List<PirateNode> tour;
+	
 	/**
 	 * Uses the MST-TSP-TOUR algorithm described in the documentation
 	 * to create a list of Edges that represents the pirate's list of
@@ -44,7 +45,12 @@ public class MSTCaptainPirate implements Pirate
 		if( tour.isEmpty() )
 		{
 			//What do we do if the tour didn't find us gold?!?
-			throw new RuntimeException ("You need to implement this method");
+			//It sucks, but we use DFS to continue searching for gold
+			// If we find all possible spots of gold, then go back to port
+			if (map.foundAllGold())
+				return map.travelTo(map.port);
+			
+			return map.DFS();
 		}
 		
 		//Follow the tour

@@ -8,9 +8,33 @@ import edu.cmu.cs211.pg.graph.*;
 import edu.cmu.cs211.pg.algorithms.Dijkstra;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class DijkstraTest {
+	
+	// 2nd stress test
+	@Test
+	public void stress2Test()
+	{
+		MyDirectedGraph<Integer,WeightedEdge<Integer>> g = new MyDirectedGraph<Integer,WeightedEdge<Integer>>();
+		Dijkstra myD = new Dijkstra();
+		Random r = new Random();
+		
+		for (int i = 0; i < 50; i++)
+			g.addVertex(Integer.valueOf(i));
+		
+		int numEdges = r.nextInt(300);
+		for (int i = 0; i < numEdges; i++)
+			g.addEdge(new WeightedEdge<Integer>(Integer.valueOf(r.nextInt(50)), Integer.valueOf(r.nextInt(50)), r.nextInt(50)));
+			
+		Map<Integer,Path<Integer, WeightedEdge<Integer>>> paths = myD.allShortestPaths(g, Integer.valueOf(49));
+		for (int i = 0; i < 49; i++) {
+			if (paths.containsKey(Integer.valueOf(i)));
+		}
+	}
 	
 	/*************************** NULL TESTS *********************************/
 	@Test (expected=NullPointerException.class)
@@ -85,6 +109,9 @@ public class DijkstraTest {
 		fail();
 	}
 	
+	/**
+	 * 'Complex' just means that it's a little more complex than the above test
+	 */
 	@Test (expected=IllegalArgumentException.class)
 	public void ComplexNegativeEdgeTest()
 	{
@@ -106,7 +133,7 @@ public class DijkstraTest {
 	}
 	
 	/**
-	 * Simplest case
+	 * Simplest case, just to check for functionality
 	 */
 	@Test 
 	public void sanityTest()
@@ -125,8 +152,9 @@ public class DijkstraTest {
 	}
 	
 	/**
-	 * Using a more complex graph I found on Wikipedia, which demonstrated
-	 * what Dijkstra's should return on this given graph
+	 * I'm using a more complex graph I found on Wikipedia, which demonstrated
+	 * what Dijkstra's should return on this given graph.  This just tests for more
+	 * basic functionality, but on a more distinct graph
 	 */
 	@Test
 	public void complexTest()
@@ -208,13 +236,6 @@ public class DijkstraTest {
 		assertEquals(myMap.get("c").pathWeight(), 6);
 		assertEquals(myMap.get("d").pathWeight(), 5);
 		assertEquals(myMap.get("e").pathWeight(), 2);
-		
-		// For some reason FrontDesk doesn't like the vertices() method
-		/*assertEquals(myMap.get("a").vertices().isEmpty(), true);
-		assertEquals(myMap.get("b").vertices(), Arrays.asList("b"));
-		assertEquals(myMap.get("c").vertices(), Arrays.asList("e", "c"));
-		assertEquals(myMap.get("d").vertices(), Arrays.asList("e", "d"));
-		assertEquals(myMap.get("e").vertices(), Arrays.asList("e"));*/
 	}
 	
 	// This code helped me realize to ALWAYS USE equals() instead of ==

@@ -3,6 +3,7 @@ package edu.cmu.cs211.pg.tests;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.LinkedList;
 
 import org.junit.Test;
 
@@ -43,6 +44,9 @@ public class MstTspApproxTest
 		g.addEdge(new WeightedEdge<Node>(b,a,w));
 	}
 	
+	/**
+	 * Test for functionality of our MstTspTest
+	 */
 	@Test (timeout=1000)
 	public void basicMstTspTest()
 	{
@@ -79,5 +83,38 @@ public class MstTspApproxTest
 		assertEquals("5th node in tour wrong",c,tour.get(4));
 		assertEquals("6th node in tour wrong",d,tour.get(5));
 		assertEquals("7th node in tour wrong",e,tour.get(6));
+	}
+	
+	/**
+	 * Does our code break if we have a lot of elements in our graph?
+	 */
+	@Test
+	public void stressTest()
+	{
+		Dijkstra dij = new Dijkstra();
+		Kruskal kru = new Kruskal();
+		Graph<Integer,WeightedEdge<Integer>> g = new MyDirectedGraph<Integer,WeightedEdge<Integer>>();
+		MstTspApproximation<Integer> tsp = new MstTspApproximation<Integer>(kru,dij);
+		
+		g.addVertex(0);
+		for (int i = 1; i < 100; i++)
+		{
+			assertEquals(g.addVertex(i), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i-1, i, 3)), true);
+			assertEquals(g.addEdge(new WeightedEdge<Integer>(i, i-1, 2)), true);
+		}
+		
+		List<Integer> tour = tsp.approximateTour(g, g.vertices(), 0);
+		List<Integer> correctTour = new LinkedList<Integer>();
+		
+		for (int i = 1; i < 99; i++)
+			correctTour.add(i);
+		
+		for (int i = 99; i >= 0; i--)
+			correctTour.add(i);
+		
+		assertEquals(tour.size(), correctTour.size());
+		for (int i = 0; i < tour.size(); i++)
+			assertEquals(tour.get(i), correctTour.get(i));
 	}
 }

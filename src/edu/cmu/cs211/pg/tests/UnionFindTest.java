@@ -9,6 +9,9 @@ import java.util.Arrays;
 
 public class UnionFindTest {
 
+	/**
+	 * Test to make sure UnionFind works
+	 */
 	@Test
 	public void sanityTest()
 	{
@@ -47,6 +50,9 @@ public class UnionFindTest {
 		//assertEquals("Checking set size", uf.uniqueSets(), 1);
 	}
 	
+	/**
+	 * Test to clear elements from uf
+	 */
 	@Test
 	public void clearTest()
 	{
@@ -77,6 +83,9 @@ public class UnionFindTest {
 		//assertEquals("Checking set size after clear", uf.uniqueSets(), 4);
 	}
 	
+	/**
+	 * Does anything happen when we try to union two sets twice?
+	 */
 	@Test
 	public void doubleUnionTest()
 	{
@@ -102,6 +111,9 @@ public class UnionFindTest {
 		//assertEquals("Checking set size", uf.uniqueSets(), 3);
 	}
 	
+	/**
+	 * Does union find hold up when we add lots of elements?
+	 */
 	@Test
 	public void stressTest()
 	{
@@ -128,9 +140,10 @@ public class UnionFindTest {
 				assertEquals(uf.find(i).equals(i), true);
 	}
 	
-	// This stress test simulates the stack overflow error I got
+	// This stress test simulates a stack overflow error I got
 	// from the public stress test
-	// It first breaks around 5000 elements
+	// It first broke around 5000 elements
+	// and was caused by inefficiently unioning sets
 	@Test
 	public void stressFindTest()
 	{

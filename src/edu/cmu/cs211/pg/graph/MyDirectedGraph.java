@@ -19,10 +19,7 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	// Stores a map of vertices to sets of vertices
 	// If we have a vertex, then the set it points to represents
 	// all the edges it can take to adjacent nodes
-	// NOTE: I'm curious about whether it helps that I use a set hashset instead of a list...
-	// We also store the edges in our graph for quicker access
 	HashMap<V, Set<E>> adjacencyList;
-	HashSet<E> graphEdges;
 	
 	/**
 	 * Creates an empty graph (a graph with no vertices or edges).
@@ -30,7 +27,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	public MyDirectedGraph()
 	{
 		adjacencyList = new HashMap<V, Set<E>>();
-		graphEdges = new HashSet<E>();
 	}
 	
 	/**
@@ -45,7 +41,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	{
 		checkForNull(vertices, "MyDirectedGraph(vertices): given a null collection!");
 		adjacencyList = new HashMap<V, Set<E>>();
-		graphEdges = new HashSet<E>();
 		
 		this.addVertices(vertices);
 	}
@@ -67,7 +62,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		checkForNull(vertices, "MyDirectedGraph(vertices, edges): given a null collection of vertices!");
 		checkForNull(edges, "MyDirectedGraph(vertices, edges): given a null collection of edges!");
 		adjacencyList = new HashMap<V, Set<E>>();
-		graphEdges = new HashSet<E>();
 		
 		// First, add our nodes to our set
 		this.addVertices(vertices);
@@ -77,6 +71,7 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	}
 	
 	// QUESTION: should I worry about shallow copying?
+	// Edges/nodes aren't mutable from what I can see, so no (probably)
 	/**
 	 * Copy Constructor
 	 * 
@@ -92,7 +87,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	{
 		checkForNull(g, "MyDirectedGraph(g): graph is null!");
 		adjacencyList = new HashMap<V, Set<E>>();
-		graphEdges = new HashSet<E>();
 		
 		// Create our collection of vertices
 		Collection<V> vertices = g.vertices();
@@ -112,12 +106,14 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	{
 		checkForNull(vertex, "addVertex(vertex): Vertex is null!");
 		
+		// Check to see if we already contain the vertex
 		if (!adjacencyList.containsKey(vertex))
 		{
 			adjacencyList.put(vertex, new HashSet<E>());
 			return true;			
 		}
 		
+		// Can't add vertices we already have
 		return false;
 	}
 	
@@ -129,20 +125,19 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		if (adjacencyList.keySet().containsAll(vertices))
 			return false;
 		
+		// Add each edge at a time
 		Iterator<? extends V> vertexIterator = vertices.iterator();
 		while (vertexIterator.hasNext())
 			this.addVertex(vertexIterator.next());
 		
 		return true;
-		//throw new RuntimeException ("You need to implement this method");
 	}
 	
 	public boolean addEdge (E e)
 	{
 		checkForNull(e, "addEdge(e): Given a null edge!");
 		
-		// Don't add if we don't contain the right nodes
-		// or if we already contain the edge
+		// Don't add illegal edges!
 		if (!adjacencyList.containsKey(e.dest()) 
 			|| !adjacencyList.containsKey(e.src()))
 				throw new IllegalArgumentException();
@@ -155,14 +150,14 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		
 		// We have to iterate through our list of edges 
 		// Since we only care about whether src/dest match up
-		// But custom edges might be defined to be different otherwise
+		// But custom edges might be defined to be different 
+		// Like WeightedEdges, which take into account weights for comparison
 		Set<E> edges = adjacencyList.get(e.src());
 		for (E edge : edges)
 			if (e.dest().equals(edge.dest()))
 				return false;
 		
 		adjacencyList.get(e.src()).add(e);
-		graphEdges.add(e);
 		return true;
 	}
 	
@@ -174,6 +169,7 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		if (adjacencyList.values().containsAll(edges))
 			return false;
 		
+		// Add each edge at a time
 		Iterator<? extends E> edgeIterator = edges.iterator();
 		while (edgeIterator.hasNext())
 			this.addEdge(edgeIterator.next());
@@ -186,18 +182,17 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		checkForNull(src, "removeEdge(src, dest): src is null!");
 		checkForNull(dest, "removeEdge(src, dest): dest is null!");
 		
+		// We can't remove illegal edges!
 		if (!adjacencyList.containsKey(src)
 			|| !adjacencyList.containsKey(dest))
 				throw new IllegalArgumentException();
 		
-		Iterator<E> edges = adjacencyList.get(src).iterator();
-		while (edges.hasNext())
+		Set<E> edges = adjacencyList.get(src);
+		for (E tempEdge : edges)
 		{
-			E tempEdge = edges.next();
 			if (tempEdge.dest().equals(dest))
 			{
 				adjacencyList.get(src).remove(tempEdge);
-				graphEdges.remove(tempEdge);
 				return true;
 			}
 		}
@@ -214,8 +209,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		Iterator<V> vertexIterator = vertices.iterator();
 		while (vertexIterator.hasNext())	
 			adjacencyList.get(vertexIterator.next()).clear();
-		
-		graphEdges.clear();
 	}
 
     public Set<V> vertices ()
@@ -228,17 +221,16 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		checkForNull(i, "adjacent(i, j): i is null!");
 		checkForNull(j, "adjacent(i, j): j is null!");
 		
+		// We're never adjacent to illegal edges
 		if (!adjacencyList.containsKey(i)
 			|| !adjacencyList.containsKey(j))
 				throw new IllegalArgumentException();
 		
-		Iterator<E> edges = adjacencyList.get(i).iterator();
-		while (edges.hasNext())
-		{
-			E tempEdge = edges.next();
+		// Look at each edge at a time
+		Set<E> edges = adjacencyList.get(i);
+		for (E tempEdge : edges)
 			if (tempEdge.dest().equals(j))
 				return tempEdge;
-		}
 		
 		return null;
 	}
@@ -265,12 +257,6 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 		return adjacencyList.get(vertex);
 	}
 	
-	/*public boolean contains (V vertex)
-	{
-		checkForNull(vertex, "contains(vertex): vertex is null!");
-		return adjacencyList.containsKey(vertex);
-	}*/
-	
 	/**
 	 * checkForNull(): Convenient method for checking null objects
 	 * and throwing exceptions
@@ -290,7 +276,12 @@ public class MyDirectedGraph<V extends Comparable<V>,E extends Edge<V>> implemen
 	 */
 	public int numEdges()
 	{
-		return graphEdges.size();
+		int size = 0;
+		
+		for (V vertex : adjacencyList.keySet())
+			size += adjacencyList.get(vertex).size();
+		
+		return size;
 	}
 }
 
